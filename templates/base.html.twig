@@ -14,6 +14,16 @@
         {% endblock %}
     </head>
     <body>
+    <div>
+        {% if is_granted("ROLE_USER") %}
+            Hi {{ app.user.email }} | <a href="{{ path("app_logout") }}">Logout</a>
+        {% elseif is_granted("IS_AUTHENTICATED_2FA_IN_PROGRESS") %}
+            Hi {{ app.user.email }}, please complete 2fa | <a href="{{ path("app_logout") }}">Cancel</a>
+        {% else %}
+            <a href="{{ path("app_login") }}">Login</a>
+        {% endif %}
+        <hr />
+    </div>
         {% block body %}{% endblock %}
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     </body>

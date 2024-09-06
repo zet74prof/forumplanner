@@ -2,9 +2,21 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface as GoogleAuthenticatorTwoFactorInterface;
+use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
@@ -28,5 +40,42 @@ class SecurityController extends AbstractController
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    #[Route(path: '/secprofile', name: 'secprofile')]
+    #[IsGranted('ROLE_USER')]
+    public function profile(Request $request): Response
+    {
+        //change password
+        if ($request->request->get('password') && $request->request->get('password') === $request->request->get('password2')) {
+            $user = $this->getUser();
+            $user->setPassword($request->request->get('password'));
+            //$this->getDoctrine()->getManager()->flush();
+        }
+
+
+        return $this->render('security/profile.html.twig', [
+        ]);
+    }
+
+    #[Route(path: '/enable2fa', name: 'app_2fa_enable')]
+    #[IsGranted('ROLE_USER')]
+    public function enable2fa(EntityManagerInterface $entityManager, GoogleAuthenticatorInterface $googleAuthenticator, TokenStorageInterface $tokenStorage): Response
+    {
+        $connectedUser = $this->getUser();
+        $secret = $googleAuthenticator->generateSecret();
+        $connectedUser->setGoogleAuthenticatorSecret($secret);
+        $entityManager->persist($connectedUser);
+        $entityManager->flush();
+
+        if (!($connectedUser instanceof GoogleAuthenticatorTwoFactorInterface)) {
+            throw new NotFoundHttpException('Cannot display QR code');
+        }
+
+        $qrCodeContent = $googleAuthenticator->getQRContent($connectedUser);
+
+        return $this->render('security/enable2fa.html.twig', [
+            'qrCodeContent' => $qrCodeContent,
+        ]);
     }
 }

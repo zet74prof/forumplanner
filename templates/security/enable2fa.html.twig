@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Enable 2FA{% endblock %}
+
+{% block body %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-center">Enable two-factor authentication</h1>
+            </div>
+        </div>
+    </div>
+
+    <img src="{{ qr_code_data_uri(qrCodeContent) }}" alt="QR Code" />
+{% endblock %}

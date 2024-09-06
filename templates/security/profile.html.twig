@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Security profile{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="text-center">Security profile for {{ app.user.email }}</h1>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Two-factor authentication</h2>
+            {% if is_granted('IS_AUTHENTICATED_2FA_INSECURE') %}
+                <p class="alert alert-warning">You are currently logged in with 2FA disabled. This is not recommended for security reasons.</p>
+            {% endif %}
+            {% if is_granted('IS_AUTHENTICATED_2FA') %}
+                <p class="alert alert-success">You are currently logged in with 2FA enabled.</p>
+            {% endif %}
+            <p>
+                <a href="{{ path('app_2fa_enable') }}" class="btn btn-primary">Enable 2FA</a>
+                <a href="" class="btn btn-danger">Disable 2FA</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Change password</h2>
+            <form method="post">
+                <label for="password">New password</label>
+                <input type="password" name="password" id="password" class="form-control" required>
+                <label for="password_repeat">Repeat new password</label>
+                <input type="password" name="password_repeat" id="password_repeat" class="form-control" required>
+                <button class="btn btn-primary" type="submit">Change password</button>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
