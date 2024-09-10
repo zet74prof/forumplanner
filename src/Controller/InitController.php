@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Salarie;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Scheb\TwoFactorBundle\Security\TwoFactor\Provider\Google\GoogleAuthenticator;
@@ -36,4 +37,5 @@ class InitController extends AbstractController
             'user' => $user,
         ]);
     }
+
 }

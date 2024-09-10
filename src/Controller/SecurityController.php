@@ -60,7 +60,7 @@ class SecurityController extends AbstractController
 
     #[Route(path: '/enable2fa', name: 'app_2fa_enable')]
     #[IsGranted('ROLE_USER')]
-    public function enable2fa(EntityManagerInterface $entityManager, GoogleAuthenticatorInterface $googleAuthenticator, TokenStorageInterface $tokenStorage): Response
+    public function enable2fa(Request $request, EntityManagerInterface $entityManager, GoogleAuthenticatorInterface $googleAuthenticator, TokenStorageInterface $tokenStorage): Response
     {
         $connectedUser = $this->getUser();
         $secret = $googleAuthenticator->generateSecret();
