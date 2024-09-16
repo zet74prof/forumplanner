@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\CheckAuthenticatorCodeType;
 use Doctrine\ORM\EntityManagerInterface;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
@@ -42,7 +43,7 @@ class SecurityController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
-    #[Route(path: '/secprofile', name: 'secprofile')]
+    #[Route(path: '/secprofile', name: 'app_security_profile')]
     #[IsGranted('ROLE_USER')]
     public function profile(Request $request): Response
     {
@@ -60,22 +61,44 @@ class SecurityController extends AbstractController
 
     #[Route(path: '/enable2fa', name: 'app_2fa_enable')]
     #[IsGranted('ROLE_USER')]
-    public function enable2fa(Request $request, EntityManagerInterface $entityManager, GoogleAuthenticatorInterface $googleAuthenticator, TokenStorageInterface $tokenStorage): Response
+    public function enable2fa(Request $request, EntityManagerInterface $entityManager, GoogleAuthenticatorInterface $googleAuthenticator): Response
     {
         $connectedUser = $this->getUser();
-        $secret = $googleAuthenticator->generateSecret();
-        $connectedUser->setGoogleAuthenticatorSecret($secret);
-        $entityManager->persist($connectedUser);
-        $entityManager->flush();
 
         if (!($connectedUser instanceof GoogleAuthenticatorTwoFactorInterface)) {
             throw new NotFoundHttpException('Cannot display QR code');
+        }
+
+        $form = $this->createForm(CheckAuthenticatorCodeType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $code = $form->get('authenticatorCode')->getData();
+            if ($googleAuthenticator->checkCode($connectedUser, strval($code))) {
+                $this->addFlash('success', 'Authentification à 2 facteurs activée avec succès.');
+            } else {
+                $connectedUser->setGoogleAuthenticatorSecret(null);
+                $entityManager->persist($connectedUser);
+                $entityManager->flush();
+                $this->addFlash('danger', 'Code invalide. L\'authentification à 2 facteurs n\'a pas pu être activée. Flashez à nouveau le QR code.');
+            }
+            return $this->redirectToRoute('app_2fa_enable');
+        } else {
+            if ($connectedUser->isGoogleAuthenticatorEnabled()) {
+                $this->addFlash('info', 'Authentification à 2 facteurs déjà activée.');
+            } else {
+                $secret = $googleAuthenticator->generateSecret();
+                $connectedUser->setGoogleAuthenticatorSecret($secret);
+                $entityManager->persist($connectedUser);
+                $entityManager->flush();
+            }
         }
 
         $qrCodeContent = $googleAuthenticator->getQRContent($connectedUser);
 
         return $this->render('security/enable2fa.html.twig', [
             'qrCodeContent' => $qrCodeContent,
+            'form' => $form,
         ]);
     }
 }
