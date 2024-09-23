@@ -85,7 +85,9 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_2fa_enable');
         } else {
             if ($connectedUser->isGoogleAuthenticatorEnabled()) {
-                $this->addFlash('info', 'Authentification à 2 facteurs déjà activée.');
+                if (count($request->getSession()->getFlashBag()->all()) === 0){
+                    $this->addFlash('info', 'Authentification à 2 facteurs déjà activée.');
+                }
             } else {
                 $secret = $googleAuthenticator->generateSecret();
                 $connectedUser->setGoogleAuthenticatorSecret($secret);
