@@ -30,6 +30,10 @@ class Forum
     #[ORM\OneToMany(targetEntity: Stand::class, mappedBy: 'forum', orphanRemoval: true)]
     private Collection $stands;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypeForum $type = null;
+
     public function __construct()
     {
         $this->stands = new ArrayCollection();
@@ -102,6 +106,18 @@ class Forum
                 $stand->setForum(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getType(): ?TypeForum
+    {
+        return $this->type;
+    }
+
+    public function setType(?TypeForum $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

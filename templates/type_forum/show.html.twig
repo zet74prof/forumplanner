@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TypeForum{% endblock %}
+
+{% block body %}
+    <h1>TypeForum</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ type_forum.id }}</td>
+            </tr>
+            <tr>
+                <th>Label</th>
+                <td>{{ type_forum.label }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_type_forum_index') }}">back to list</a>
+
+    <a href="{{ path('app_type_forum_edit', {'id': type_forum.id}) }}">edit</a>
+
+    {{ include('type_forum/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit TypeForum{% endblock %}
+
+{% block body %}
+    <h1>Edit TypeForum</h1>
+
+    {{ include('type_forum/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_type_forum_index') }}">back to list</a>
+
+    {{ include('type_forum/_delete_form.html.twig') }}
+{% endblock %}

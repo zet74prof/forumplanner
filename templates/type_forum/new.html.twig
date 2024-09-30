@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New TypeForum{% endblock %}
+
+{% block body %}
+    <h1>Create new TypeForum</h1>
+
+    {{ include('type_forum/_form.html.twig') }}
+
+    <a href="{{ path('app_type_forum_index') }}">back to list</a>
+{% endblock %}
