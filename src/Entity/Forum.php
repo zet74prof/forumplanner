@@ -34,6 +34,10 @@ class Forum
     #[ORM\JoinColumn(nullable: false)]
     private ?TypeForum $type = null;
 
+    #[ORM\ManyToOne(inversedBy: 'forums')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->stands = new ArrayCollection();
@@ -120,5 +124,30 @@ class Forum
         $this->type = $type;
 
         return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    //calculate the average of the evaluations
+    public function getAverageEvaluations(): float
+    {
+        $total = 0;
+        $count = 0;
+        foreach ($this->stands as $stand) {
+            $total += $stand->getAvgNotes();
+            $count++;
+        }
+
+        return $count > 0 ? $total / $count : 0;
     }
 }

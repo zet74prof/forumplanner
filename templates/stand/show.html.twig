@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stand{% endblock %}
+
+{% block body %}
+    <h1>Stand</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ stand.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ stand.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ stand.description }}</td>
+            </tr>
+            <tr>
+                <th>Capacity</th>
+                <td>{{ stand.capacity }}</td>
+            </tr>
+            <tr>
+                <th>Duration</th>
+                <td>{{ stand.duration ? stand.duration|date('H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Moyenne des notes</th>
+                <td>{{ stand.avgNotes }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_stand_index') }}">back to list</a>
+
+    <a href="{{ path('app_stand_edit', {'id': stand.id}) }}">edit</a>
+
+    {{ include('stand/_delete_form.html.twig') }}
+
+<div class="row">
+    <button class="btn btn-primary m-5" data-bs-toggle="modal" data-bs-target="#addStandModal">Ajouter une évaluation</button>
+    <div class="modal fade" id="addStandModal" tabindex="-1" aria-labelledby="addStandModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addStandModalLabel">Ajouter une évaluation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(form) }}
+                    {{ form_row(form.note) }}
+                    {{ form_row(form.comment) }}
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <h2>Les évaluations du stand {{ stand.title }}</h2>
+    <div class="card-group">
+        {% for evaluation in stand.evaluations %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ evaluation.note }}</h5>
+                    <p class="card-text">{{ evaluation.comment }}</p>
+                </div>
+            </div>
+    </div>
+    {% else %}
+        <p>Il n'y a pas encore d'évaluation pour ce stand</p>
+    {% endfor %}
+</div>
+{% endblock %}

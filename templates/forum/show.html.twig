@@ -22,7 +22,11 @@
             <tr>
                 <th>Location</th>
                 <td>{{ forum.location }}</td>
+            <tr>
+                <th>Note du forum</th>
+                <td>{{ forum.averageEvaluations }}</td>
             </tr>
+
         </tbody>
     </table>
 
@@ -31,4 +35,42 @@
     <a href="{{ path('app_forum_edit', {'id': forum.id}) }}">edit</a>
 
     {{ include('forum/_delete_form.html.twig') }}
+
+    <div class="row">
+        <h2>Les stands du forum {{ forum.title }}</h2>
+        <div class="card-group">
+            {% for stand in forum.stands %}
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ stand.title }}</h5>
+                        <p class="card-text">{{ stand.description }}</p>
+                        <a href="{{ path('app_stand_show', {'id': stand.id}) }}" class="btn btn-primary">Voir le stand</a>
+                    </div>
+                </div>
+            {% else %}
+                <p>Créez un stand pour mettre un peu d'animation dans votre forum!</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <button class="btn btn-primary m-5" data-bs-toggle="modal" data-bs-target="#addStandModal">Ajouter un stand</button>
+        <div class="modal fade" id="addStandModal" tabindex="-1" aria-labelledby="addStandModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addStandModalLabel">Ajouter un stand</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{ form_start(standForm) }}
+                        {{ form_row(standForm.title) }}
+                        {{ form_row(standForm.description) }}
+                        {{ form_row(standForm.capacity) }}
+                        {{ form_row(standForm.duration) }}
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                        {{ form_end(standForm) }}
+                    </div>
+                </div>
+            </div>
+    </div>
 {% endblock %}
